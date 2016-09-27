@@ -3,6 +3,8 @@ var expect = chai.expect;
 var models = require('../models');
 var Page = models.Page;
 var User = models.User;
+var marked = require('marked');
+
 
 
 describe('Page model', function () {
@@ -35,17 +37,37 @@ describe('Page model', function () {
 
     describe('renderedContent', function () {
       it('converts the markdown-formatted content into HTML', function() {
-
+        expect(testPage.renderedContent).to.equal(marked(testPage.content));
       });
-      // expect(testPage.route).to.equal('/wiki/Test');
     });
   });
 
 
-  xdescribe('Class methods', function () {
+  describe('Class methods', function () {
+    var testPage;
+    beforeEach(function(done){
+      Page.create({
+        title: 'test title',
+        content: 'test content',
+        tags: ['tag1', 'tag2', 'tag3']
+      })
+      .then(function(page){ 
+        testPage = page;
+        done();
+      })
+    });
+
     describe('findByTag', function () {
       it('gets pages with the search tag', function() {
+         var result;
+        Page.findByTag('tag1')
+        .then(function (pages) {
+            result = pages;
+        });
+        console.log(result)
+        console.log(testPage,'testPage')
 
+        expect(result[0]).to.equal(testPage);
       });
       it('does not get pages without the search tag', function() {
 
