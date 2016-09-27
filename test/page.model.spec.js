@@ -4,7 +4,7 @@ var models = require('../models');
 var Page = models.Page;
 var User = models.User;
 var marked = require('marked');
-
+// require chai-things??
 
 
 describe('Page model', function () {
@@ -54,42 +54,106 @@ describe('Page model', function () {
       .then(function(page){ 
         testPage = page;
         done();
-      })
+      });
     });
 
     describe('findByTag', function () {
-      it('gets pages with the search tag', function() {
-         var result;
+      it('gets pages with the search tag', function(done) {
+        var result;
+
         Page.findByTag('tag1')
         .then(function (pages) {
-            result = pages;
-        });
-        console.log(result)
-        console.log(testPage,'testPage')
-
-        expect(result[0]).to.equal(testPage);
+          result = pages;
+          expect(result[0].title).to.equal(testPage.title);
+          done();
+        })
+        .catch(done);
       });
-      it('does not get pages without the search tag', function() {
 
+      it('does not get pages without the search tag', function(done) {
+        Page.findByTag('tag4')
+        .then(function (pages) {
+          var result = pages;
+          expect(result.length).to.equal(0);
+          done();
+        })
+        .catch(done);
       });
     });
   });
 
-  xdescribe('Instance methods', function () {
+  describe('Instance methods', function () {
+    var testPage1, testPage2, testPage3;
+
+    beforeEach(function(done) {
+      Page.create({
+        title: 'Page 1',
+        content: 'test content',
+        tags: ['tag1', 'tag2']
+      })
+      .then(function(page) {
+        testPage1 = page;
+      });
+
+      Page.create({
+        title: 'Page 2',
+        content: 'test content',
+        tags: ['tag2', 'tag3']
+      })
+      .then(function(page) {
+        testPage2 = page;
+      });
+
+      Page.create({
+        title: 'Page 3',
+        content: 'test content',
+        tags: ['tag4']
+      })
+      .then(function(page) {
+        testPage3 = page;
+        done();
+      });
+
+    });
+
     describe('findSimilar', function () {
-      it('never gets itself', function() {
+      it('never gets itself', function(done) {
+        testPage1.findSimilar()
+        .then(function (pages) {
+          var result = pages.map(page => page.title);
 
+          expect(result.should.not.include('Page 1'));
+          done();
+        })
+        .catch(done);
       });
-      it('gets other pages with any common tags', function() {
 
-      });
-      it('does not get other pages without any common tags', function() {
+      it('gets other pages with any common tags', function(done) {
+        testPage1.findSimilar()
+        .then(function (pages) {
+          var result = pages.map(page => page.title);
 
+          expect(result.should.include.something.that.deep.equals('Page 2'));
+          done();
+        })
+        .catch(done);
       });
+
+      it('does not get other pages without any common tags', function(done) {
+        testPage1.findSimilar()
+        .then(function (pages) {
+          var result = pages.map(page => page.title);
+
+          expect(result.should.not.include('Page 3'));
+          done();
+        })
+        .catch(done);
+      });
+
     });
   });
 
-  xdescribe('Validations', function () {
+  describe('Validations', function () {
     it('errors without title', function() {
 
     });
