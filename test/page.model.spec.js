@@ -4,8 +4,8 @@ var models = require('../models');
 var Page = models.Page;
 var User = models.User;
 var marked = require('marked');
-// require chai-things??
-
+chai.should();
+chai.use(require('chai-things'));
 
 describe('Page model', function () {
   beforeEach(function(done) {
@@ -154,15 +154,51 @@ describe('Page model', function () {
   });
 
   describe('Validations', function () {
-    it('errors without title', function() {
+    var testPage;
 
+
+    // beforeEach(function() {
+    //   testPage = Page.build({
+    //         status: 'skittle'
+    //       });
+    //     });
+
+    it('errors without title', function(done) {
+      var testPage = Page.build({
+            content: 'skittle',
+            status: 'open'
+          });
+      
+      testPage.validate().then(function(errors){
+          expect(errors.errors[0].path).to.equal('title');
+          done();
+      })
+      
     });
-    it('errors without content', function() {
+    it('errors without content', function(done) {
+      var testPage = Page.build({
+            title: 'skittle',
+            urlTitle: 'skittle',
+            status: 'open'
+          });
+      
+      testPage.validate().then(function(errors){
+          expect(errors.errors[0].path).to.equal('content');
+          done();
+      })
 
     });
     it('errors given an invalid status', function() {
+      var testPage = Page.build({
+            title: 'skittle',
+            urlTitle: 'skittle',
+            content: 'cereal',
+            status: 'ahh'
+          });
+      
+      expect(['open', 'closed'].includes(testPage.status)).to.equal(false);
 
-    });
+      });
   });
 
   xdescribe('Hooks', function () {
