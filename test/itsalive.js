@@ -4,7 +4,7 @@ var expect = chai.expect;
 
 chai.use(spies);
 
-describe('spies on doubler', function() {
+xdescribe('spies on doubler', function() {
 	it('spies exactly 3 times', function () {
 		var array = [1, 2, 3];
 		var doubler = function(number) {
